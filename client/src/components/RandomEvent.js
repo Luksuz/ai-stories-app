@@ -1,6 +1,5 @@
 import { Modal, Button, Form } from "react-bootstrap";
 import { useState } from "react";
-import "./RandomEvent.css";
 
 export default function RandomEventBtn(props) {
   const [show, setShow] = useState(false);

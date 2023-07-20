@@ -40,6 +40,10 @@ const storySchema = mongoose.Schema({
     imagePrompts:{
         type: String,
         required : [true, "Please add the user name"]
+    },
+    images:{
+        type: String,
+        required : [true, "Please add the user name"]
     }
 },
 {timestamps: true}

@@ -13,32 +13,25 @@ const openai = new OpenAIApi(configuration)
 //@route POST /api/stories/generate
 //@access Public
 
+// if the request body contains only userInput, the bot will generate the first part of the story,
+// otherwise it will generate the next parts of the story (2-5)
 const getStories = asyncHandler(async (req, res) => {
   const {synopsis, previousPart, nextPart, randomEvent, userInput} = req.body;
   let response;
-  console.log(req.body)
   if(userInput){
-      console.log(userInput);
       response = await openai.createCompletion({
       model: 'text-davinci-003',
-      prompt: `You are an AI developed by OpenAI.
-      You have been trained on a vast range of internet text.
-      But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
+      prompt: `You are a movie scenarist and your specialty is in creating unique and compelling movie scenarios.
       You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
       You can generate scenarios in any genre, time period, or setting.
       
-      Your task is to generate 4 different sections divided by the %%% delimiter.:
+      Your task is to generate 3 different sections divided by the %%% delimiter.:
       section1: The title based on the synopsis given.
       section2: A movie synopsis based on the user prompt given below.
       section3: The first part of the scenario based on synopsis.            
-      section4: An image generation prompt that describes a key scene from the first part of the scenario. 
 
-      The image prompt should be concise, vivid and descriptive.
-      The image prompt should avoid using character-specific names or group identifiers, 
-      but rather describe the characters and groups in broad terms for general understanding.
-      and should not have the tag names included(synopsis, part1, ImagePrompt) for easier array splitting later. 
       ###
-      prompt: An archeologist finds a lost treasure map and sails seven seas to find it.
+      user prompt: An archeologist finds a lost treasure map and sails seven seas to find it.
       %%%
       title: 
       The Treasure of Atlantis
@@ -68,13 +61,10 @@ const getStories = asyncHandler(async (req, res) => {
       The first part ends with Amelia and her team setting sail into the Atlantic, the ancient map guiding their way. 
       Unbeknownst to them, Stirling's ship follows at a distance, setting the stage for the conflict to come.
       %%%
-      ImagePrompt:
-      A sun-soaked archaeological site in Egypt, with a prominent female archaeologist clutching an ancient, ornate box. 
-      Within the box, a worn parchment map filled with mysterious symbols is revealed. 
-      In the background, a group of excited explorers ready themselves for a maritime expedition, while a sinister ship hovers ominously on the distant horizon.            
       ###
       ###
-      Prompt: A honeybee makes its way to Hollywood fame by imitating Snoop Dog.
+      Prompt: 
+      A honeybee makes its way to Hollywood fame by imitating Snoop Dog.
       %%%
       title: 
       The Bee's Knees
@@ -94,42 +84,45 @@ const getStories = asyncHandler(async (req, res) => {
       With a suitcase in one hand and a bee box in the other, Tom and Buzz set off to Hollywood, ready to take the film industry by storm. 
       Little do they know, Hollywood is a place like no other, filled with cutthroat competition and where fame can be fleeting.
       %%%
-      ImagePrompt:
-      An idyllic honeybee hive nestled in a lush field, with a tiny bee bobbing its head rhythmically to a faint beat. 
-      Nearby, a confused yet intrigued man, ear pressed to a flower, listens to the peculiar rhythm echoing from the hive. 
-      In the distance, the glimmering lights of Hollywood loom promisingly.
       ###
       ###
-      prompt:
+      user prompt:
       ${userInput}
       %%%
+      title:
 
       %%%
-      
+      synopsis:
+
       %%%
-      
-      %%%
-      
+      part1:
+
       ###
       `,
       max_tokens: 2000,
       temperature: 1
   });
-  console.log(response.data.choices[0].text);
+  response = response.data.choices[0].text
+  response = response.split("%%%")
   if(response){
-    res.status(200).json({response: response.data.choices[0].text, message: "This is the first part of the story"})
+    let prompt = await getPrompt(response[response.length - 1]);
+    res.status(200).json({response: response, imagePrompt: prompt, message: "This is the first part of the story"})
   } else {
       res.status(400).json({message: "an error happened!"})
   }
-
 }else{
-  console.log(req.body);
   response = await openai.createCompletion({
   model: 'text-davinci-003',
-  prompt: `Based on the synopsis given,write the next part of the story
-  that corresponds to the previous part.Here are some examples.
-  The part you will be generating is ${nextPart[0]}, the previous part is ${nextPart[1]}.
-  if the random event is not empty, write a story part that corresponds to the random event.
+  prompt: `You are an AI developed by OpenAI.
+  You have been trained on a vast range of internet text.
+  But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
+  You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
+  You can generate scenarios in any genre, time period, or setting.
+  Your task is to generate the next part of the story(${nextPart[0]}) based on the previous part(${nextPart[1]}).
+  If the next part of the story is part5, you should brign the story to the end based on synopsis, weather its a good or a bad ending.
+  
+  Here are some examples:
+  ###
   ###
   random event:
 
@@ -167,6 +160,7 @@ const getStories = asyncHandler(async (req, res) => {
   The journey is not only about finding Atlantis but also about self-discovery and transformation.
   With their eyes fixed on the horizon, Amelia and her team embark on the next chapter of their adventure, ready to unveil the mysteries that lie beneath the waves.
   ###
+  ###
   randomEvent: 
   a scorching fireball crashes into nearby ground.  
   synopsis:
@@ -198,28 +192,112 @@ const getStories = asyncHandler(async (req, res) => {
   With eyes fixed on the horizon, Amelia and her team embark on the next chapter, ready to unveil the mysteries beneath the waves. 
   The impact of the scorching fireball remains with them, propelling their destined path to greatness.
   ###
+  ###
   random event: ${randomEvent}
   synopsis: ${synopsis}
   previous part: ${previousPart}
-  next part:`,
+  next part:
+  `,
+  
   max_tokens: 2000,
   temperature: 1
   });
-  console.log("the response is:", response.data.choices[0].text);       
-  if(response){
-      res.status(200).json({response: response.data.choices[0].text, message: "This is the rest of the story"})
+  response = response.data.choices[0].text;
+  console.log("the response is:", response);       
+  if (res) {
+    let prompt = await getPrompt(response);
+    res.status(200).json({ message: "success", response: response, imagePrompt: prompt });
   } else {
-      res.status(400).json({message: "an error happened!"})
+  res.status(400).json({message: "an error happened!"})
   }
 }});
+
+
+// a function for generating the image prompt from the story part given
+async function getPrompt(storyPart){
+  response = await openai.createCompletion({
+  model: 'text-davinci-003',
+  prompt: `Write an image prompt based on the story part given, here are 2 examples:
+  
+  story part:
+  The movie opens in the sun-scorched deserts of Egypt. 
+  Dr. Amelia Hart, a dedicated and slightly eccentric archeologist, is leading an excavation at a newly discovered pyramid. 
+  Her team unearths a mysterious artifact - a small, ornate box sealed for thousands of years. 
+  Inside, they find a parchment - a map, filled with cryptic symbols and markings. 
+  Amelia recognizes these as ancient Atlantean - a language she has spent her career studying.
+  News of the discovery spreads quickly, attracting the attention of rival treasure hunter, 
+  Victor Stirling, a ruthless and wealthy collector of lost artifacts. 
+  He offers a fortune to buy the map, but Amelia refuses, determined to follow the journey it outlines.
+  With her loyal team, she sets off to find the necessary resources and equipment for the expedition. 
+  They face numerous challenges, including securing funding, gathering a capable crew, and preparing for the unknown dangers of deep-sea exploration. 
+  As they prepare, they are unaware that Stirling, feeling scorned, has begun to plot against them, determined to claim the treasure of Atlantis for himself.
+  The first part ends with Amelia and her team setting sail into the Atlantic, the ancient map guiding their way. 
+  Unbeknownst to them, Stirling's ship follows at a distance, setting the stage for the conflict to come.
+  imagePrompt:
+  A sun-soaked archaeological site in Egypt, with a prominent female archaeologist clutching an ancient, ornate box. 
+  Within the box, a worn parchment map filled with mysterious symbols is revealed. 
+  In the background, a group of excited explorers ready themselves for a maritime expedition, 
+  while a sinister ship hovers ominously on the distant horizon.            
+  ###
+  story part:
+  Word of the incredible discovery spread like wildfire, reaching far beyond the scientific community. 
+  Governments, private organizations, and individuals alike were intrigued by the potential implications. 
+  Among them was the enigmatic billionaire, Richard Blackwood, a tech mogul with an insatiable thirst for power and knowledge.
+  Blackwood, sensing an opportunity to gain unimaginable advancements and control, set his sights on possessing the alien technology. 
+  He offered Christpher an unprecedented fortune to hand over the data and device. 
+  But Christpher, driven by her scientific principles and the desire to foster peaceful cooperation, refused his offer, 
+  believing that knowledge of this magnitude should benefit all of humanity, not just a select few.
+  In the ensuing days, Christpher's lab became a fortress, guarded against potential threats. With the help of her loyal team, 
+  he focused on deciphering the alien message and developing a response, hoping to build bridges between Earth and the distant civilization.
+  Unbeknownst to Christpher, Blackwood was not one to be thwarted easily. 
+  He launched a covert operation to infiltrate Christpher's lab and steal the coveted technology, 
+  driven by his obsession for control and desire to outdo his competitors.
+  imagePrompt:
+  A scientific laboratory with a glass cupola, fortified with modern technology,
+  filled with state-of-the-art equipment and a team of dedicated scientists,
+  a dark and omnious sky in the background with an evil male human face lurking in the clouds.
+  ###
+  story part:
+  ${storyPart}
+  imagePrompt:
+
+  `,
+  max_tokens: 200
+  });
+  response = response.data.choices[0].text;
+
+  return response;
+};
+
+//@desc get images from openai
+//@route POST /api/stories/images
+//@access public
+
+// a function for fetching the image from openai based on the image prompt given
+// (the last imagePrompt in the imagePrompts array)
+const getImages = asyncHandler(async (req, res) => {
+  const { imagePrompt } = req.body;
+  const response = await openai.createImage({
+    prompt: imagePrompt,
+    n: 1,
+    size: "1024x1024",
+  });
+  image_url = response.data.data[0].url;
+  if (response) {
+    res.status(200).json({ response: image_url });
+  } else {
+    res.status(400).json({ message: "an error happened!" });
+  }
+});
+
 
 //@desc store stories in the database
 //@route POST /api/stories/store
 //@access public
 
+// a function for storing the story and its relevant data in the database, including image URL-s
 const createStories = asyncHandler(async (req, res) => {
   const { title, part1, part2, part3, part4, part5 } = req.body;
-  console.log(req.body);
   if (!req.body) {
     res.status(400);
     throw new Error("No story data provided");
@@ -235,6 +313,7 @@ const createStories = asyncHandler(async (req, res) => {
     part5: part5,
     randomEvents: req.body.randomEvents,
     imagePrompts: req.body.imagePrompts,
+    images: req.body.images,
   });
   if (story) {
     res.status(201).json({message: "storyCreated"});
@@ -242,7 +321,20 @@ const createStories = asyncHandler(async (req, res) => {
   else {
     res.status(400).json({message: "Invalid story data(all parts must be filled)"});
   }
-  console.log(story);
 });
 
-module.exports = {createStories, getStories}
+//@desc get stories from the database
+//@route GET /api/recent
+//@access public
+
+// a function for fetching the 5 most recent stories from the database that will be displayed on the home page carousel.
+const getRecentStories = asyncHandler(async (req, res) => {
+  const stories = await Story.find({}).sort({createdAt: -1}).limit(5);
+  if (stories) {
+    res.status(200).json({ stories });
+  } else {
+    res.status(400).json({ message: "an error happened!" });
+  }
+});
+
+module.exports = {createStories, getStories, getImages, getRecentStories}

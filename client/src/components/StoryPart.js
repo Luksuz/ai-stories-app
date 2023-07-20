@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
 import RandomEventBtn from "./RandomEvent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./StoryPart.css";
@@ -7,6 +7,7 @@ import {
   fetchBotReply,
   generateStoryParts,
   saveStories,
+  generateImages,
 } from "../utils/ApiUtils";
 
 export default function StoryPart() {
@@ -23,8 +24,11 @@ export default function StoryPart() {
       part5: null,
     },
     randomEvents: [],
-    prompts: [],
+    imagePrompts: [],
+    images: [],
   });
+  // a state for tracking which parts of the story have been fetched from the openai
+  // (unnecessary and has to be refactored)
   const [dataFetched, setDataFetched] = useState({
     part1Fetched: false,
     part2Fetched: false,
@@ -33,22 +37,30 @@ export default function StoryPart() {
     part5Fetched: false,
     lastPartFetched: null,
   });
+  // a state for tracking which part of the story is the previous one and which is the next one[nextPart, previousPart]
   const [nextPart, setNextPart] = useState(null);
+  // a flag for disabling the submit button while the story is being generated and spinners to take effect.
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // a hook for generating the next part of the story when the previous one is fetched
   useEffect(() => {
+    const lastPrompt = story.imagePrompts.length - 1;
     switch (true) {
       case dataFetched.part4Fetched:
         setNextPart(["part 5", "part 4"]);
+        generateImages(story.imagePrompts[lastPrompt], setStory);
         break;
       case dataFetched.part3Fetched:
         setNextPart(["part 4", "part 3"]);
+        generateImages(story.imagePrompts[lastPrompt], setStory);
         break;
       case dataFetched.part2Fetched:
         setNextPart(["part 3", "part 2"]);
+        generateImages(story.imagePrompts[lastPrompt], setStory);
         break;
       case dataFetched.part1Fetched:
         setNextPart(["part 2", "part 1"]);
+        generateImages(story.imagePrompts[0], setStory);
         break;
       default:
         setNextPart(null);
@@ -58,19 +70,8 @@ export default function StoryPart() {
 
   useEffect(() => {
     saveStories(story, userInput);
+    // eslint-disable-next-line
   }, [story.storyParts.part5]);
-
-  /*useEffect(() => {
-      if(dataFetched.promptsFetched) {
-          const fetchImagesSequentially = async () => {
-              for (let i = 0; i < story.prompts.length; i++) {
-                  await generateImages(story.prompts[i]);
-                  await sleep(1000);
-              }
-          }
-          fetchImagesSequentially();
-          }
-      }, [dataFetched.promptsFetched])*/
 
   const handleChange = (event) => {
     setUserInput(event.target.value);
@@ -79,7 +80,6 @@ export default function StoryPart() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsGenerating(true);
-    console.log(isGenerating);
     await fetchBotReply(userInput, setStory, setDataFetched, setIsGenerating);
     setUserInput("");
   };
@@ -97,7 +97,8 @@ export default function StoryPart() {
         part5: null,
       },
       randomEvents: [],
-      prompts: [],
+      imagePrompts: [],
+      images: [],
     });
     setDataFetched({
       part1Fetched: false,
@@ -108,14 +109,16 @@ export default function StoryPart() {
       lastPartFetched: null,
     });
     setNextPart(null);
-    setIsGenerating(false);
+    setRandomEventInput("");
   }
 
+  // a function for mapping the story parts to the DOM
   const mappedStories = Object.values(story.storyParts)
-    .filter((storyPart) => storyPart) // Filter out null or undefined parts
+    .filter((storyPart) => storyPart)
     .map((storyPart, index) => (
       <div key={index}>
-        <p>{storyPart}</p>
+        <p className="border radius-1 p-2 ">{storyPart}</p>
+        <img src={story.images[index]} className="w-100"></img>
         {dataFetched.lastPartFetched === storyPart && (
           <div className="story-buttons">
             {!isGenerating ? (
@@ -126,7 +129,7 @@ export default function StoryPart() {
                     generateStoryParts(
                       story.synopsis,
                       dataFetched.lastPartFetched,
-                      nextPart[1],
+                      nextPart,
                       randomEventInput,
                       story,
                       setStory,
@@ -198,7 +201,7 @@ export default function StoryPart() {
       <Row className="storyPart justify-content-center">
         <Col className="story-container" md={12}>
           <div className="story-text">
-            <h1>{story.title}</h1>
+            <h2 className="">{story.title}</h2>
             {mappedStories}
           </div>
         </Col>

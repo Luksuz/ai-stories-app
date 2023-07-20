@@ -1,12 +1,5 @@
-function extractPrompts(text) {
-  const prompts = text.split("%%%").map((prompt) => prompt.trim());
-  prompts.forEach((prompt) => {
-    prompt.length < 10 && prompts.splice(prompts.indexOf(prompt), 1);
-  });
-  return prompts;
-}
-
 // a function for fetching the initial part of the story
+
 async function fetchBotReply(
   userInput,
   setStory,
@@ -29,11 +22,11 @@ async function fetchBotReply(
       }),
     });
     const data = await response.json();
-    const pollutedStoryData = extractPrompts(data.response);
-    const storyData = pollutedStoryData.map((item) =>
+    const imagePrompt = data.imagePrompt;
+    const pollutedData = data.response;
+    const storyData = pollutedData.map((item) =>
       item.replace(/ImagePrompt:|synopsis:|part1:/gi, "")
     );
-    console.log(storyData);
     setStory((prevStory) => ({
       ...prevStory,
       title: storyData[0],
@@ -42,7 +35,7 @@ async function fetchBotReply(
         ...prevStory.storyParts,
         part1: storyData[2],
       },
-      prompts: [...prevStory.prompts, storyData[3]],
+      imagePrompts: [...prevStory.imagePrompts, imagePrompt],
     }));
     setDataFetched((prevDataFetched) => ({
       ...prevDataFetched,
@@ -79,26 +72,32 @@ async function generateStoryParts(
         previousPart: previousPart,
         nextPart: nextPart,
         randomEvent: randomEvent,
+        imagePrompt: story.imagePrompts[story.imagePrompts.length - 1],
         userInput: "",
       }),
     });
     const data = await response.json();
+    let storyPart = data.response;
+    let imagePrompt = data.imagePrompt;
+    storyPart = storyPart.replace(/nextPart:/gi, "")
+    imagePrompt = imagePrompt.replace(/ImagePrompt:/gi, "")
     switch (true) {
       case previousPart === story.storyParts.part1:
-        setDataFetched((prevDataFetched) => ({
-          ...prevDataFetched,
-          part2Fetched: true,
-        }));
         setStory((prevStory) => ({
           ...prevStory,
           storyParts: {
             ...prevStory.storyParts,
-            part2: data.response,
+            part2: storyPart,
           },
           randomEvents: [
             ...prevStory.randomEvents,
             randomEvent ? `random input: ${randomEvent} at ${nextPart}` : "",
           ],
+          imagePrompts: [...prevStory.imagePrompts, imagePrompt],
+        }));
+        setDataFetched((prevDataFetched) => ({
+          ...prevDataFetched,
+          part2Fetched: true,
         }));
         break;
       case previousPart === story.storyParts.part2:
@@ -110,12 +109,13 @@ async function generateStoryParts(
           ...prevStory,
           storyParts: {
             ...prevStory.storyParts,
-            part3: data.response,
+            part3: storyPart,
           },
           randomEvents: [
             ...prevStory.randomEvents,
             randomEvent ? `random input: ${randomEvent} at ${nextPart}` : "",
           ],
+          imagePrompts: [...prevStory.imagePrompts, imagePrompt],
         }));
         break;
       case previousPart === story.storyParts.part3:
@@ -127,12 +127,13 @@ async function generateStoryParts(
           ...prevStory,
           storyParts: {
             ...prevStory.storyParts,
-            part4: data.response,
+            part4: storyPart,
           },
           randomEvents: [
             ...prevStory.randomEvents,
             randomEvent ? `random input: ${randomEvent} at ${nextPart}` : "",
           ],
+          imagePrompts: [...prevStory.imagePrompts, imagePrompt],
         }));
         break;
       case previousPart === story.storyParts.part4:
@@ -144,12 +145,13 @@ async function generateStoryParts(
           ...prevStory,
           storyParts: {
             ...prevStory.storyParts,
-            part5: data.response,
+            part5: storyPart,
           },
           randomEvents: [
             ...prevStory.randomEvents,
             randomEvent ? `random input: ${randomEvent} at ${nextPart}` : "",
           ],
+          imagePrompts: [...prevStory.imagePrompts, imagePrompt],
         }));
         break;
       default:
@@ -158,16 +160,33 @@ async function generateStoryParts(
     }
     setDataFetched((prevDataFetched) => ({
       ...prevDataFetched,
-      lastPartFetched: data.response,
+      lastPartFetched: storyPart,
     }));
     setRandomEventInput("");
   } catch (error) {
     console.log(error);
-  }
+  } 
   setIsGenerating(false);
 }
 
-// a function for saving the story to the database(must include the title and all 5 parts)
+
+// a function for fetching images from the openai
+async function generateImages(prompt, setStory) {
+  const response = await fetch("http://localhost:5000/api/stories/images", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ imagePrompt: prompt })
+  });
+  const data = await response.json();
+  setStory((prevState) => ({
+    ...prevState,
+    images: [...prevState.images, data.response]
+  }));
+}
+
+// a function for saving the story to the database(must include all of the story data from the storyModel)
 async function saveStories(story) {
   const { part1, part2, part3, part4, part5 } = story.storyParts;
   const response = await fetch("http://localhost:5000/api/stories/store", {
@@ -186,10 +205,17 @@ async function saveStories(story) {
       part5: part5,
       randomEvents: story.randomEvents,
       imagePrompts: story.prompts,
+      images: story.images
     }),
   });
   const data = await response.json();
-  console.log(data);
 }
 
-export { fetchBotReply, generateStoryParts, saveStories };
+// a function for loading the most recent stories from the database
+async function loadRecentStories() {
+  const response = await fetch("http://localhost:5000/api/stories/recent");
+  const data = await response.json();
+  return data;
+};
+
+export { fetchBotReply, generateStoryParts, saveStories, generateImages, loadRecentStories };
