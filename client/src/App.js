@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Button, Modal, Carousel, Alert } from 'react-bootstrap';
+///import { useState, useEffect } from 'react';
+//import { Button, Modal, Carousel, Alert } from 'react-bootstrap';
 import StoryPart from './components/StoryPart';
 
 export default function App() {
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  //const handleClose = () => setShow(false);
+  //const handleShow = () => setShow(true);
   /*const [recentStories, setRecentStories] = useState([]);*/
 
   /*useEffect(() => {

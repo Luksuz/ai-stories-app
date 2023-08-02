@@ -208,7 +208,6 @@ async function saveStories(story) {
       images: story.images
     }),
   });
-  const data = await response.json();
 }
 
 // a function for loading the most recent stories from the database

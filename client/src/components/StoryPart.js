@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Row, Spinner } from "react-bootstrap";
 import RandomEventBtn from "./RandomEvent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./StoryPart.css";
@@ -66,6 +66,7 @@ export default function StoryPart() {
         setNextPart(null);
     }
     setRandomEventInput("");
+    // eslint-disable-next-line
   }, [dataFetched]);
 
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function StoryPart() {
     .map((storyPart, index) => (
       <div key={index}>
         <p className="border radius-1 p-2 ">{storyPart}</p>
-        <img src={story.images[index]} className="w-100"></img>
+        <img src={story.images[index]} className="w-100" alt={index}></img>
         {dataFetched.lastPartFetched === storyPart && (
           <div className="story-buttons">
             {!isGenerating ? (
