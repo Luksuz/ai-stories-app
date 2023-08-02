@@ -1,5 +1,6 @@
-///import { useState, useEffect } from 'react';
-//import { Button, Modal, Carousel, Alert } from 'react-bootstrap';
+import { useState } from 'react';
+//import { Button, Modal, Carousel } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import StoryPart from './components/StoryPart';
 
 export default function App() {
