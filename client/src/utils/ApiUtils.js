@@ -8,7 +8,7 @@ async function fetchBotReply(
 ) {
   try {
     setIsGenerating(true);
-    const response = await fetch("http://localhost:5000/api/stories/generate", {
+    const response = await fetch("https://aistories-394717.ew.r.appspot.com/api/stories/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
