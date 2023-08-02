@@ -21,7 +21,7 @@ export default function App() {
   return (
     <div className="flex display-flex">
       <h1 className="p-4">Welcome to the interactive AI generated Stories</h1>
-      <Alert variant="warning" onClose={() => setShow(false)} dismissible>
+      <Alert variant="warning" show={show} onClose={() => setShow(false)} dismissible>
         <Alert.Heading>Other users stories coming sooooooon...</Alert.Heading>
       </Alert>
       <StoryPart />
