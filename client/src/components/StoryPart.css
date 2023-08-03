@@ -7,7 +7,7 @@ p,h2{
     margin: 10px 50px;
     padding: 0.5rem;
     border-radius: 10px;
-    background-color: rgba(12, 12, 12, 0.5);
+    background-color: #F24C3D80;
     font-size: 1.5rem;
     color: white;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
@@ -29,8 +29,8 @@ img{
 }
 .input-box{
     border-radius: 10px;
-    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
-    background: rgba(12, 12, 12, 0.5);
+    box-shadow: 4px 4px 4px rgba(118, 19, 19, 0.5);
+    background: #22A69980;
     color: white;
 }
 .input-text{

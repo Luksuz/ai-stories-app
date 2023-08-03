@@ -118,8 +118,8 @@ export default function StoryPart() {
     .filter((storyPart) => storyPart)
     .map((storyPart, index) => (
       <div key={index}>
-        <p className="border radius-1 p-2 ">{storyPart}</p>
-        <img src={story.images[index]} className="w-100" alt={index}></img>
+        <p className="radius-1 p-2 ">{storyPart}</p>
+        <img src={story.images[index]} className="w-100" alt={(index + 1) + ". story part"}></img>
         {dataFetched.lastPartFetched === storyPart && (
           <div className="story-buttons">
             {!isGenerating ? (
@@ -183,6 +183,16 @@ export default function StoryPart() {
                 onChange={handleChange}
               />
             </label>
+            {isGenerating? <Button variant="primary" disabled>
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                Generating...
+              </Button> :
             <Button
               variant={
                 dataFetched.part1Fetched || isGenerating
@@ -196,13 +206,14 @@ export default function StoryPart() {
             >
               Submit
             </Button>
+            }
           </form>
         </Col>
       </Row>
       <Row className="storyPart justify-content-center">
         <Col className="story-container" md={12}>
-          <div className="story-text">
-            <h2 className="">{story.title}</h2>
+          <div>
+            {story.title && <h2>{story.title}</h2>}
             {mappedStories}
           </div>
         </Col>
