@@ -6,7 +6,6 @@ import "./StoryPart.css";
 import {
   fetchBotReply,
   generateStoryParts,
-  saveStories,
   generateImages,
 } from "../utils/ApiUtils";
 
@@ -68,11 +67,6 @@ export default function StoryPart() {
     setRandomEventInput("");
     // eslint-disable-next-line
   }, [dataFetched]);
-
-  useEffect(() => {
-    saveStories(story, userInput);
-    // eslint-disable-next-line
-  }, [story.storyParts.part5]);
 
   const handleChange = (event) => {
     setUserInput(event.target.value);

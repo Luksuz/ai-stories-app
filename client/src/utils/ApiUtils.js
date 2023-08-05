@@ -153,6 +153,7 @@ async function generateStoryParts(
           ],
           imagePrompts: [...prevStory.imagePrompts, imagePrompt],
         }));
+        saveStories(story);
         break;
       default:
         console.log("something went wrong");
@@ -218,4 +219,4 @@ async function loadRecentStories() {
   return data;
 };
 
-export { fetchBotReply, generateStoryParts, saveStories, generateImages, loadRecentStories };
+export { fetchBotReply, generateStoryParts, generateImages, loadRecentStories };
