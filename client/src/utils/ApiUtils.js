@@ -189,6 +189,7 @@ async function generateImages(prompt, setStory) {
 
 // a function for saving the story to the database(must include all of the story data from the storyModel)
 async function saveStories(story) {
+  console.log("saving story");
   const { part1, part2, part3, part4, part5 } = story.storyParts;
   //eslint-disable-next-line
   const response = await fetch("https://aistories-394717.ew.r.appspot.com/api/stories/store", {
@@ -210,6 +211,7 @@ async function saveStories(story) {
       images: story.images
     }),
   });
+  console.log("story saved" + response);
 }
 
 // a function for loading the most recent stories from the database
