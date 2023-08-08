@@ -111,9 +111,19 @@ export default function StoryPart() {
   const mappedStories = Object.values(story.storyParts)
     .filter((storyPart) => storyPart)
     .map((storyPart, index) => (
-      <div key={index}>
-        <p className="radius-1 p-2 ">{storyPart}</p>
-        <img src={story.images[index]} className="w-100" alt={(index + 1) + ". story part"}></img>
+      <div>
+        <div key={index} className="row">
+          <div className="col-lg-5">
+            <p className="radius-1">{storyPart}</p>
+          </div>
+          <div className="col-lg-7">
+            <img
+              src={story.images[index]}
+              className="w-100"
+              alt={index + 1 + ". story part"}
+            />
+          </div>
+        </div>
         {dataFetched.lastPartFetched === storyPart && (
           <div className="story-buttons">
             {!isGenerating ? (
@@ -177,7 +187,8 @@ export default function StoryPart() {
                 onChange={handleChange}
               />
             </label>
-            {isGenerating? <Button variant="primary" disabled>
+            {isGenerating ? (
+              <Button variant="primary" disabled>
                 <Spinner
                   as="span"
                   animation="grow"
@@ -186,21 +197,22 @@ export default function StoryPart() {
                   aria-hidden="true"
                 />
                 Generating...
-              </Button> :
-            <Button
-              variant={
-                dataFetched.part1Fetched || isGenerating
-                  ? "secondary"
-                  : "primary"
-              }
-              className="submit-button rounded-pill"
-              type="submit"
-              value="Submit"
-              disabled={dataFetched.part1Fetched || isGenerating}
-            >
-              Submit
-            </Button>
-            }
+              </Button>
+            ) : (
+              <Button
+                variant={
+                  dataFetched.part1Fetched || isGenerating
+                    ? "secondary"
+                    : "primary"
+                }
+                className="submit-button rounded-pill"
+                type="submit"
+                value="Submit"
+                disabled={dataFetched.part1Fetched || isGenerating}
+              >
+                Submit
+              </Button>
+            )}
           </form>
         </Col>
       </Row>

@@ -1,5 +1,5 @@
-// a function for fetching the initial part of the story
 
+// a function for fetching the initial part of the story
 async function fetchBotReply(
   userInput,
   setStory,
@@ -25,7 +25,7 @@ async function fetchBotReply(
     const imagePrompt = data.imagePrompt;
     const pollutedData = data.response;
     const storyData = pollutedData.map((item) =>
-      item.replace(/ImagePrompt:|synopsis:|part1:/gi, "")
+      item.replace(/ImagePrompt:|title:|synopsis:|part1:/gi, "")
     );
     setStory((prevStory) => ({
       ...prevStory,
