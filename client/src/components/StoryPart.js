@@ -73,6 +73,7 @@ export default function StoryPart() {
   };
 
   const handleSubmit = async (event) => {
+    console.log("A story was submitted: " + userInput);
     event.preventDefault();
     setIsGenerating(true);
     await fetchBotReply(userInput, setStory, setDataFetched, setIsGenerating);
@@ -113,6 +114,7 @@ export default function StoryPart() {
     .map((storyPart, index) => (
       <div>
         <div key={index} className="row">
+          <h3 className="ms-3">{index + 1 + ". story part"}</h3>
           <div className="col-lg-5">
             <p className="radius-1">{storyPart}</p>
           </div>
@@ -123,6 +125,8 @@ export default function StoryPart() {
               alt={index + 1 + ". story part"}
             />
           </div>
+
+          <hr className="mt-2"></hr>
         </div>
         {dataFetched.lastPartFetched === storyPart && (
           <div className="story-buttons">
@@ -219,7 +223,7 @@ export default function StoryPart() {
       <Row className="storyPart justify-content-center">
         <Col className="story-container" md={12}>
           <div>
-            {story.title && <h2>{story.title}</h2>}
+            {story.title && <h1 className="d-flex justify-content-center align-items-center pt-3">{story.title}</h1>}
             {mappedStories}
           </div>
         </Col>

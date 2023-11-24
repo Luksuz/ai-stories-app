@@ -18,6 +18,7 @@ const openai = new OpenAIApi(configuration)
 const getStories = asyncHandler(async (req, res) => {
   const {synopsis, previousPart, nextPart, randomEvent, userInput} = req.body;
   let response;
+  console.log("the request body is:", req.body);
   if(userInput){
       response = await openai.createCompletion({
       model: 'text-davinci-003',
@@ -278,6 +279,7 @@ async function getPrompt(storyPart){
 const getImages = asyncHandler(async (req, res) => {
   const { imagePrompt } = req.body;
   const response = await openai.createImage({
+    model: "dall-e-3",
     prompt: imagePrompt,
     n: 1,
     size: "1024x1024",

@@ -8,7 +8,7 @@ export default function RandomEventBtn(props) {
 
   return (
     <>
-      <Button onClick={handleShow} variant="warning">
+      <Button onClick={handleShow} variant="warning" className="mx-4">
         Add a custom event
       </Button>
 
