@@ -1,0 +1,16 @@
+.textarea {
+    width: 100%;
+    padding: 1.2rem;
+    font-family: inherit;
+    color: inherit;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    resize: none;
+    margin-bottom: 1.8rem;
+    outline: none;
+    font-size: 1.8rem;
+
+    &::placeholder {
+        color: #ccc;
+    }
+}

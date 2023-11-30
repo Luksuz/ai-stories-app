@@ -1,0 +1,15 @@
+.copy-button {
+    &.button {
+        border: 1px solid #666;
+    }
+
+    background-color: #fff;
+    color: #666;
+
+    &:hover,
+    &:active {
+        background-color: #eee;
+        color: #222;
+        border-color: #222;
+    }
+}

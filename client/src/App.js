@@ -1,30 +1,27 @@
 import { useState } from 'react';
-//import { Button, Modal, Carousel } from 'react-bootstrap';
-import { Alert } from 'react-bootstrap';
-import StoryPart from './components/StoryPart';
+import "./App.scss"
+import { InitialStoryPrompt } from './initialStoryPrompt/InitialStoryPrompt';
+import { StoryContext } from './context/StoryContext';
+import { Chapter } from './chapters/Chapter';
 
 export default function App() {
-  const [show, setShow] = useState(false);
-  //const handleClose = () => setShow(false);
-  //const handleShow = () => setShow(true);
-  /*const [recentStories, setRecentStories] = useState([]);*/
-
-  /*useEffect(() => {
-    const fetchRecentStories = async () => {
-      const response = await loadRecentStories();
-      setRecentStories(response);
-    };
-
-    fetchRecentStories();
-  }, []);*/
+  const [story, setStory] = useState({ userPrompt: "", activeChapterId: 0, chapters: [] });
 
   return (
-    <div className="flex display-flex">
-      <h1 className="p-4">Welcome to the interactive AI generated Stories</h1>
-      <Alert variant="warning" show={show} onClose={() => setShow(false)} dismissible>
-        <Alert.Heading>Other users stories coming sooooooon...</Alert.Heading>
-      </Alert>
-      <StoryPart />
-    </div>
-  );
+    <main className='first-screen'>
+      <h1 className='first-screen__title'>Welcome to the interactive AI generator Stories</h1>
+
+      <StoryContext.Provider value={{ story, setStory }}>
+        {story.chapters.length === 0 &&
+          <InitialStoryPrompt />}
+
+        {story.chapters.length > 0 &&
+          <Chapter
+            key={story.activeChapterId}
+            activeChapter={story.chapters.find(x => x.id === story.activeChapterId)} />}
+
+      </StoryContext.Provider>
+
+    </main>
+  )
 }

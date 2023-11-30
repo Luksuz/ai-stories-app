@@ -1,0 +1,19 @@
+.spinner {
+    display: inline-block;
+
+    &__svg {
+        width: 3rem;
+        height: 3rem;
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        animation: spin 1s linear infinite;
+        fill: #2c0b99;
+        --tw-text-opacity: 1;
+        color: rgb(229 231 235 / var(--tw-text-opacity));
+    }
+}
