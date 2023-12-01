@@ -27,72 +27,83 @@ Story structure
 export default function App() {
   const [story, setStory] = useState({ userPrompt: "", title: "", synopsis: "", chapters: [] });
   const [activeChapterId, setActiveChapterId] = useState(null);
+  const [error, setError] = useState(false);
 
   const setInitialChapter = async (randomEvent) => {
-    const data = await fetchStory("", "", "", "", randomEvent);
-    const nextActiveChapterId = 1;
+    setError(() => false)
+    try {
+      const data = await fetchStory("", "", "", "", randomEvent);
+      const nextActiveChapterId = 1;
 
-    setStory(() => {
-      return {
-        userPrompt: randomEvent,
-        title: data.storyData[0],
-        synopsis: data.storyData[1],
-        chapters: [
-          {
-            id: nextActiveChapterId,
-            content: data.storyData[2],
-            imagePrompt: data.imagePrompt,
-            image: "",
-            randomEvent: "" // on initial story prompt, we are saving prompt/event on userPrompt
-          },
-        ],
-      }
-    });
+      setStory(() => {
+        return {
+          userPrompt: randomEvent,
+          title: data.storyData[0],
+          synopsis: data.storyData[1],
+          chapters: [
+            {
+              id: nextActiveChapterId,
+              content: data.storyData[2],
+              imagePrompt: data.imagePrompt,
+              image: "",
+              randomEvent: "" // on initial story prompt, we are saving prompt/event on userPrompt
+            },
+          ],
+        }
+      });
 
-    setActiveChapterId(() => nextActiveChapterId);
-    getImage(nextActiveChapterId, data.imagePrompt);
+      setActiveChapterId(() => nextActiveChapterId);
+      getImage(nextActiveChapterId, data.imagePrompt);
+    } catch (error) {
+      setError(() => true)
+    }
   }
 
   const setChapter = async (randomEvent) => {
-    const nextActiveChapterId = activeChapterId + 1;
-    const activeChapter = story.chapters.find(x => x.id === activeChapterId);
+    setError(() => false)
+    try {
+      const nextActiveChapterId = activeChapterId + 1;
+      const activeChapter = story.chapters.find(x => x.id === activeChapterId);
 
-    const data = await fetchStory(
-      story.synopsis,
-      activeChapter.content,
-      ["part " + nextActiveChapterId, "part " + activeChapterId],
-      randomEvent,
-      ""
-    );
+      const data = await fetchStory(
+        story.synopsis,
+        activeChapter.content,
+        ["part " + nextActiveChapterId, "part " + activeChapterId],
+        randomEvent,
+        ""
+      );
 
-    if (story.chapters.some(x => x.id === nextActiveChapterId)) {
-      // if we are changing existing chapter, delete chapters after the next active
+      if (story.chapters.some(x => x.id === nextActiveChapterId)) {
+        // if we are changing existing chapter, delete chapters after the next active
+        setStory((oldValue) => {
+          return {
+            ...oldValue,
+            chapters: oldValue.chapters.filter(x => x.id < nextActiveChapterId),
+          }
+        });
+      }
+
+      // if we are adding new chapter
       setStory((oldValue) => {
         return {
           ...oldValue,
-          chapters: oldValue.chapters.filter(x => x.id < nextActiveChapterId),
+          chapters: [
+            ...oldValue.chapters,
+            {
+              id: nextActiveChapterId,
+              content: data.storyData,
+              imagePrompt: data.imagePrompt,
+              randomEvent: randomEvent
+            },
+          ],
         }
       });
+
+      setActiveChapterId(() => nextActiveChapterId);
+      getImage(nextActiveChapterId, data.imagePrompt);
+    } catch (error) {
+      setError(() => true)
     }
-
-    // if we are adding new chapter
-    setStory((oldValue) => {
-      return {
-        ...oldValue,
-        chapters: [
-          ...oldValue.chapters,
-          {
-            id: nextActiveChapterId,
-            content: data.storyData,
-            imagePrompt: data.imagePrompt,
-            randomEvent: randomEvent
-          },
-        ],
-      }
-    });
-
-    setActiveChapterId(() => nextActiveChapterId);
-    getImage(nextActiveChapterId, data.imagePrompt);
   }
 
   const getImage = async (chapterId, imagePrompt) => {
@@ -125,8 +136,6 @@ export default function App() {
     setActiveChapterId(() => activeChapterId + 1)
   }
 
-  console.log(story)
-
   return (
     <main className='first-screen'>
       <h1 className='first-screen__title'>Welcome to the interactive AI generator Stories</h1>
@@ -148,8 +157,10 @@ export default function App() {
             goToPreviousChapter={goToPreviousChapter}
             goToNextChapter={goToNextChapter}
           />}
-
       </StoryContext.Provider>
+
+      {error &&
+        <p className='first-screen__error'>Something went wrong. Please try again.</p>}
 
     </main>
   )
