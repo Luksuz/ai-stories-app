@@ -4,7 +4,7 @@ export const Spinner = () => {
     return (
         <div role="status" className="spinner">
             <svg
-                ariaHidden="true"
+                aria-hidden="true"
                 className="spinner__svg"
                 viewBox="0 0 100 101"
                 fill="none"

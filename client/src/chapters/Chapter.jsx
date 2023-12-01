@@ -1,117 +1,87 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import "./Chapter.scss";
-import { StoryContext } from "../context/StoryContext";
-import { fetchImage, fetchStory } from "../utils/ApiService";
 import { SubscribeFooter } from "./components/SubscribeFooter";
 import { RandomEvent } from "./components/RandomEvent";
 import { ArticleButtons } from "./components/ArticleButtons";
 import { ChapterTitle } from "./components/ChapterTitle";
 import { Image } from "./components/Image";
 
-export const Chapter = ({ activeChapter }) => {
-    const { story, setStory } = useContext(StoryContext);
+export const Chapter = ({
+    image,
+    goToPreviousChapter,
+    goToNextChapter,
+    id,
+    content,
+    chaptersLength,
+    setChapter,
+}) => {
     const [randomEvent, setRandomEvent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const chaptersLength = story.chapters.length;
     const maxNumberOfChapters = 5;
     const maxNumberOfFreeChapters = 5;
 
-    useEffect(() => {
-        if (!activeChapter.image) {
-            getImage();
-        }
-    }, []);
-
-    const getImage = async () => {
-        const image = await fetchImage(activeChapter.imagePrompt);
-        setStory({
-            ...story,
-            chapters: [
-                ...story.chapters,
-                {
-                    ...activeChapter,
-                    image: image,
-                },
-            ],
-        });
-    };
-
     const submitClick = () => {
-        generateNextChapter();
+        generateNextChapter(randomEvent);
     };
 
     const continueClick = () => {
-        setRandomEvent(() => "");
-        generateNextChapter();
+        setRandomEvent("");
+        generateNextChapter("");
     };
 
-    const generateNextChapter = async () => {
+    const generateNextChapter = async (newRandomEvent) => {
         setIsLoading(() => true);
 
-        const nextActiveChapter = activeChapter.id + 1;
-
-        const data = await fetchStory(
-            activeChapter.storyData.synopsis,
-            activeChapter.storyData.content,
-            ["part " + nextActiveChapter, "part " + activeChapter.id],
-            randomEvent,
-            ""
-        );
-
-        setStory({
-            userPrompt: "",
-            activeChapterId: nextActiveChapter,
-            chapters: [
-                ...story.chapters,
-                {
-                    id: nextActiveChapter,
-                    message: data.message,
-                    imagePrompt: data.imagePrompt,
-                    storyData: {
-                        title: story.chapters[0].storyData[0],
-                        synopsis: story.chapters[0].storyData[1],
-                        content: data.storyData,
-                    },
-                },
-            ],
-        });
+        await setChapter(newRandomEvent);
 
         setIsLoading(() => false);
+    };
+
+    const backClick = () => {
+        goToPreviousChapter();
+    };
+
+    const nextClick = () => {
+        goToNextChapter();
     };
 
     return (
         <section className="chapter">
             <article className="chapter__article">
-                <Image image={activeChapter.image} />
+                <Image image={image} />
 
                 <ChapterTitle
                     chaptersLength={chaptersLength}
-                    activeChapterId={activeChapter.id}
-                    maxNumberOfChapters={maxNumberOfChapters}
+                    activeChapterId={id}
                     maxNumberOfFreeChapters={maxNumberOfFreeChapters}
                 />
 
-                <p className="chapter__article--content">{activeChapter.storyData.content}</p>
+                <p className="chapter__article--content">{content}</p>
 
                 <div className="chapter__article--buttons">
                     <ArticleButtons
-                        isLoading={isLoading && !randomEvent}
+                        showSpinner={isLoading && !randomEvent}
+                        isDisabled={isLoading}
                         chapterLength={chaptersLength}
-                        content={activeChapter.storyData.content}
+                        id={id}
+                        content={content}
                         continueClick={continueClick}
+                        onBackClick={backClick}
+                        onNextClick={nextClick}
                     />
                 </div>
             </article>
             <div className="chapter__footer">
-                {chaptersLength < maxNumberOfFreeChapters ? (
+                {chaptersLength === maxNumberOfFreeChapters && chaptersLength === id ? (
+                    <SubscribeFooter />
+                ) : (
                     <RandomEvent
-                        isLoading={isLoading && randomEvent}
+                        showSpinner={isLoading && randomEvent}
+                        isDisabled={isLoading}
                         submitClick={submitClick}
                         randomEvent={randomEvent}
                         setRandomEvent={setRandomEvent}
                     />
-                ) : (
-                    <SubscribeFooter />
                 )}
             </div>
         </section>

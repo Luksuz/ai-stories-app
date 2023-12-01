@@ -6,7 +6,7 @@ import { StoryContext } from "../context/StoryContext";
 import { fetchStory } from "../utils/ApiService";
 import { Spinner } from "../spinner/Spinner";
 
-export const InitialStoryPrompt = () => {
+export const InitialStoryPrompt = ({ setInitialChapter }) => {
     const { _, setStory } = useContext(StoryContext);
     const [randomEvent, setRandomEvent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -14,24 +14,8 @@ export const InitialStoryPrompt = () => {
     const handleGenerateAStoryClick = async () => {
         setIsLoading(() => true);
 
-        const data = await fetchStory("", "", "", "", randomEvent);
+        await setInitialChapter(randomEvent);
 
-        setStory({
-            userPrompt: "",
-            activeChapterId: 1,
-            chapters: [
-                {
-                    id: 1,
-                    message: data.message,
-                    imagePrompt: data.imagePrompt,
-                    storyData: {
-                        title: data.storyData[0],
-                        synopsis: data.storyData[1],
-                        content: data.storyData[2],
-                    },
-                },
-            ],
-        });
         setIsLoading(() => false);
     };
 

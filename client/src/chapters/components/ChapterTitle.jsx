@@ -1,20 +1,15 @@
-export const ChapterTitle = ({
-    chaptersLength,
-    activeChapterId,
-    maxNumberOfChapters,
-    maxNumberOfFreeChapters,
-}) => {
+export const ChapterTitle = ({ chaptersLength, activeChapterId, maxNumberOfFreeChapters }) => {
     return (
         <h4 className="chapter__article--title">
             Story (
             <span
                 className={`${
-                    chaptersLength >= maxNumberOfFreeChapters
+                    chaptersLength >= maxNumberOfFreeChapters && activeChapterId === chaptersLength
                         ? "chapter__article--title-subscribe"
                         : ""
                 }`}
             >
-                part {activeChapterId} / {maxNumberOfChapters}
+                part {activeChapterId} / {chaptersLength}
             </span>
             )
         </h4>

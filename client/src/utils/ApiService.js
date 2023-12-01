@@ -1,6 +1,6 @@
 const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInput) => {
   const response = await fetch(
-    "http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/generate",
+    "http://ai-stories-env.eba-mpeny5cm.us-east-1.elasticbeanstalk.com/api/stories/generate",
     {
       method: "POST",
       headers: {
@@ -26,7 +26,7 @@ const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInp
 
 const fetchImage = async (imagePrompt) => {
   const response = await fetch(
-    "http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/images", {
+    "http://ai-stories-env.eba-mpeny5cm.us-east-1.elasticbeanstalk.com/api/stories/images", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

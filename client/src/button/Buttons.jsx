@@ -1,6 +1,13 @@
 import "./Button.scss";
 
-export const Button = ({ text, handleClick, isDisabled, className = "", icon }) => {
+export const Button = ({
+    text,
+    handleClick,
+    isDisabled,
+    className = "",
+    icon,
+    iconRight = false,
+}) => {
     return (
         <button
             type="button"
@@ -8,8 +15,9 @@ export const Button = ({ text, handleClick, isDisabled, className = "", icon }) 
             onClick={handleClick}
             disabled={isDisabled}
         >
-            {icon}
+            {!iconRight && icon}
             <span>{text}</span>
+            {iconRight && icon}
         </button>
     );
 };
