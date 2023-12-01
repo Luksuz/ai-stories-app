@@ -1,13 +1,10 @@
 import "./InitialStoryPrompt.scss";
 import { GenerateButton } from "../button/GenerateButton";
 import { Textarea } from "../textarea/Textarea";
-import { useContext, useState } from "react";
-import { StoryContext } from "../context/StoryContext";
-import { fetchStory } from "../utils/ApiService";
 import { Spinner } from "../spinner/Spinner";
+import { useState } from "react";
 
 export const InitialStoryPrompt = ({ setInitialChapter }) => {
-    const { _, setStory } = useContext(StoryContext);
     const [randomEvent, setRandomEvent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 

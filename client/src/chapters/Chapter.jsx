@@ -17,7 +17,6 @@ export const Chapter = ({
 }) => {
     const [randomEvent, setRandomEvent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const maxNumberOfChapters = 5;
     const maxNumberOfFreeChapters = 5;
 
     const submitClick = () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import "./App.scss"
 import { InitialStoryPrompt } from './initialStoryPrompt/InitialStoryPrompt';
 import { StoryContext } from './context/StoryContext';
