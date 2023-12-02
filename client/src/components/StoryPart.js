@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Row, Spinner } from "react-bootstrap";
 import RandomEventBtn from "./RandomEvent";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./StoryPart.css";
 import {
   fetchBotReply,

@@ -1,0 +1,28 @@
+.subscribe-button {
+    text-decoration: none;
+    font-size: 1.8rem;
+    letter-spacing: 0.02rem;
+    font-weight: 500;
+    padding: 1.6rem 3rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    background-image: linear-gradient(to right, #1d42c4, #4a21c2);
+    color: #fff;
+
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    min-width: 15rem;
+
+    &:hover,
+    &:active {
+        background-image: linear-gradient(to right, #022aba, #2d0a98);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+    }
+}
