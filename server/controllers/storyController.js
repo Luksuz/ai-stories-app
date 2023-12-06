@@ -105,6 +105,7 @@ const getStories = asyncHandler(async (req, res) => {
   });
   response = response.data.choices[0].text
   response = response.split("%%%")
+  console.log("the response is:", response);
   if(response){
     let prompt = await getPrompt(response[response.length - 1]);
     res.status(200).json({response: response, imagePrompt: prompt, message: "This is the first part of the story"})
@@ -119,7 +120,7 @@ const getStories = asyncHandler(async (req, res) => {
   But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
   You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
   You can generate scenarios in any genre, time period, or setting.
-  Your task is to generate the next part of the story(${nextPart[0]}) based on the previous part(${nextPart[1]}).
+  Your task is to generate the next part of the story(${nextPart}) based on the previous part(${nextPart - 1}).
   If the next part of the story is part5, you should brign the story to the end based on synopsis, weather its a good or a bad ending.
   
   Here are some examples:

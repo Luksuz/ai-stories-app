@@ -9,7 +9,7 @@ async function fetchBotReply(
   try {
     setIsGenerating(true);
     console.log("fetching bot reply");
-    const response = await fetch("http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/generate", {
+    const response = await fetch("http://localhost:5000/api/stories/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ async function generateStoryParts(
 ) {
   try {
     setIsGenerating(true);
-    const response = await fetch("http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/generate", {
+    const response = await fetch("http://localhost:5000/api/stories/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -175,7 +175,7 @@ async function generateStoryParts(
 
 // a function for fetching images from the openai
 async function generateImages(prompt, setStory) {
-  const response = await fetch("http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/images", {
+  const response = await fetch("http://localhost:5000/api/stories/images", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -218,7 +218,7 @@ async function saveStories(story) {
 
 // a function for loading the most recent stories from the database
 async function loadRecentStories() {
-  const response = await fetch("http://Ai-stories.eu-north-1.elasticbeanstalk.com/api/stories/recent");
+  const response = await fetch("http://localhost:5000/api/stories/recent");
   const data = await response.json();
   return data;
 };
