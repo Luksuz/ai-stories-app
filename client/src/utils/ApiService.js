@@ -1,8 +1,9 @@
 const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInput) => {
     const response = await fetch(
-      "http://stories.us-east-1.elasticbeanstalk.com/api/stories/generate",
+      "http://aistories.us-east-1.elasticbeanstalk.com/api/stories/generate",
       {
         method: "POST",
+        
         headers: {
           "Content-Type": "application/json",
         },
@@ -26,7 +27,7 @@ const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInp
   
   const fetchImage = async (imagePrompt) => {
     const response = await fetch(
-      "http://stories.us-east-1.elasticbeanstalk.com/api/stories/images", {
+      "http://aistories.us-east-1.elasticbeanstalk.com/api/stories/images", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
