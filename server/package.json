@@ -19,12 +19,9 @@
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.3.2",
     "nodemon": "^2.0.22",
-    "openai": "^3.3.0",
+    "openai": "^4.24.7",
     "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
-    
-  },
-  "devDependencies": {
   }
 }

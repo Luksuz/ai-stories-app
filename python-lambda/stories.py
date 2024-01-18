@@ -7,13 +7,12 @@ client = OpenAI(
 )
 
 def lambda_handler(event, context):
-    """body = json.loads(event["body"])
+    body = json.loads(event["body"])
     userInput = body["userInput"]
     nextPart = body["nextPart"]
     randomEvent = body["randomEvent"]
     synopsis = body["synopsis"]
-    previousPart = body["previousPart"]"""
-    userInput = "great white shark"
+    previousPart = body["previousPart"]
     
 
 
@@ -117,7 +116,7 @@ def lambda_handler(event, context):
     else:
         response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        prompt=[{"role": "system", "content": f"""You are an AI developed by OpenAI.
+        messages=[{"role": "system", "content": f"""You are an AI developed by OpenAI.
         You have been trained on a vast range of internet text.
         But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
         You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
@@ -276,5 +275,3 @@ def getPrompt(storyPart):
                 "imagePrompt": response.choices[0].message.content
             })
             }
-
-lambda_handler(None, None)

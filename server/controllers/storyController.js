@@ -1,12 +1,15 @@
 const express = require('express');
-const { Configuration, OpenAIApi } = require("openai")
 const asyncHandler = require("express-async-handler");
-const env = require("dotenv").config();
+require('dotenv').config();
 const Story = require("../models/storyModel");
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const { OpenAI } = require('openai');
+
+const apiKey = process.env.OPENAI_API_KEY;
+console.log("the api key is:", apiKey);
+
+const openai = new OpenAI({
+  apiKey: apiKey,
 });
-const openai = new OpenAIApi(configuration)
 
 
 //@desc generate stories
@@ -19,17 +22,14 @@ const getStories = asyncHandler(async (req, res) => {
   const {synopsis, previousPart, nextPart, randomEvent, userInput} = req.body;
   let response;
   console.log("the request body is:", req.body);
+ 
   if(userInput){
-      response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: `You are a movie scenarist and your specialty is in creating unique and compelling movie scenarios.
+      response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{"role": "system", "content": `You are a movie scenarist and your specialty is in creating unique and compelling movie scenarios.
       You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
-      You can generate scenarios in any genre, time period, or setting.
-      
-      Your task is to generate 3 different sections divided by the %%% delimiter.:
-      section1: The title based on the synopsis given.
-      section2: A movie synopsis based on the user prompt given below.
-      section3: The first part of the scenario based on synopsis.            
+      You can generate scenarios in any genre, time period, or setting. 
+      Make sure to split the sections with the %%% delimiter as shown in the example.          
 
       ###
       user prompt: An archeologist finds a lost treasure map and sails seven seas to find it.
@@ -86,25 +86,31 @@ const getStories = asyncHandler(async (req, res) => {
       Little do they know, Hollywood is a place like no other, filled with cutthroat competition and where fame can be fleeting.
       %%%
       ###
-      ###
-      user prompt:
-      ${userInput}
-      %%%
-      title:
+                 
+      Your task is to generate 3 different sections divided by the %%% delimiter.:
+      section1: The title based on the synopsis given.
+      section2: A movie synopsis based on the user prompt given below.
+      section3: The first part of the scenario based on synopsis.  
+      `},
+      {"role": "user", "content": `
+                                  user prompt:
+                                  ${userInput}
+                                  %%%
+                                  title:
 
-      %%%
-      synopsis:
+                                  %%%
+                                  synopsis:
 
-      %%%
-      part1:
+                                  %%%
+                                  part1:
 
-      ###
-      `,
+                                  `
+                                  }
+      ],
       max_tokens: 2000,
       temperature: 1
   });
-  response = response.data.choices[0].text
-  response = response.split("%%%")
+  response = response.choices[0].message.content.split("%%%");
   console.log("the response is:", response);
   if(response){
     let prompt = await getPrompt(response[response.length - 1]);
@@ -113,9 +119,9 @@ const getStories = asyncHandler(async (req, res) => {
       res.status(400).json({message: "an error happened!"})
   }
 }else{
-  response = await openai.createCompletion({
-  model: 'text-davinci-003',
-  prompt: `You are an AI developed by OpenAI.
+  response = await openai.chat.completions.create({
+  model: 'gpt-3.5-turbo',
+  messages: [{"role": "system", "content": `You are an AI developed by OpenAI.
   You have been trained on a vast range of internet text.
   But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
   You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
@@ -194,17 +200,17 @@ const getStories = asyncHandler(async (req, res) => {
   With eyes fixed on the horizon, Amelia and her team embark on the next chapter, ready to unveil the mysteries beneath the waves. 
   The impact of the scorching fireball remains with them, propelling their destined path to greatness.
   ###
+  json format
   ###
   random event: ${randomEvent}
   synopsis: ${synopsis}
   previous part: ${previousPart}
-  next part:
-  `,
+  next part:`}] ,
   
   max_tokens: 2000,
   temperature: 1
   });
-  response = response.data.choices[0].text;
+  response = response.choices[0].message.content;
   console.log("the response is:", response);       
   if (res) {
     let prompt = await getPrompt(response);
@@ -217,10 +223,9 @@ const getStories = asyncHandler(async (req, res) => {
 
 // a function for generating the image prompt from the story part given
 async function getPrompt(storyPart){
-  response = await openai.createCompletion({
-  model: 'text-davinci-003',
-  prompt: `Write an image prompt based on the story part given, here are 2 examples:
-  
+  response = await openai.chat.completions.create({
+  model: 'gpt-3.5-turbo',
+  messages: [{"role": "system", "content": ` Write an image prompt based on the story part given, here are 2 examples: 
   story part:
   The movie opens in the sun-scorched deserts of Egypt. 
   Dr. Amelia Hart, a dedicated and slightly eccentric archeologist, is leading an excavation at a newly discovered pyramid. 
@@ -258,15 +263,15 @@ async function getPrompt(storyPart){
   A scientific laboratory with a glass cupola, fortified with modern technology,
   filled with state-of-the-art equipment and a team of dedicated scientists,
   a dark and omnious sky in the background with an evil male human face lurking in the clouds.
-  ###
+  ###json format`},
+  {"role": "user", "content": `
   story part:
   ${storyPart}
-  imagePrompt:
-
-  `,
+  imagePrompt:`}
+  ],
   max_tokens: 200
   });
-  response = response.data.choices[0].text;
+  response = response.choices[0].message.content;
 
   return response;
 };
@@ -279,13 +284,13 @@ async function getPrompt(storyPart){
 // (the last imagePrompt in the imagePrompts array)
 const getImages = asyncHandler(async (req, res) => {
   const { imagePrompt } = req.body;
-  const response = await openai.createImage({
+  const response = await openai.images.generate({
     model: "dall-e-3",
     prompt: imagePrompt,
     n: 1,
     size: "1024x1024",
   });
-  image_url = response.data.data[0].url;
+  image_url = response.data[0].url
   if (response) {
     res.status(200).json({ response: image_url });
   } else {
@@ -339,5 +344,7 @@ const getRecentStories = asyncHandler(async (req, res) => {
     res.status(400).json({ message: "an error happened!" });
   }
 });
+
+
 
 module.exports = {createStories, getStories, getImages, getRecentStories}
