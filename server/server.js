@@ -9,7 +9,7 @@ connectDB();
 const cors = require('cors');
 //add all origins
 app.use(cors( {origin: '*'}));
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 
 const options = {

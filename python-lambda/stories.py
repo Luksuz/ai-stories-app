@@ -18,7 +18,7 @@ def lambda_handler(event, context):
 
     if userInput:
         response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{"role": "system", "content": f"""You are a movie scenarist and your specialty is in creating unique and compelling movie scenarios.
         You understand the elements of a great movie, including plot development, character arcs, conflict, and resolution.
         You can generate scenarios in any genre, time period, or setting.          
@@ -115,7 +115,7 @@ def lambda_handler(event, context):
             })}
     else:
         response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{"role": "system", "content": f"""You are an AI developed by OpenAI.
         You have been trained on a vast range of internet text.
         But unlike most AI models, your specialty is in creating unique and compelling movie scenarios.
@@ -220,7 +220,7 @@ def lambda_handler(event, context):
 
 def getPrompt(storyPart):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{"role": "system", "content": f""" Write an image prompt based on the story part given, here are 2 examples: 
     story part:
     The movie opens in the sun-scorched deserts of Egypt. 
