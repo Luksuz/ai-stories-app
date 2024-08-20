@@ -1,6 +1,6 @@
 const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInput) => {
     const response = await fetch(
-      "https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate",
+      "https://us-central1-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_text",
       {
         method: "POST",
         

@@ -64,7 +64,7 @@ async function generateStoryParts(
 ) {
   try {
     setIsGenerating(true);
-    const response = await fetch("https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_img", {
+    const response = await fetch("https://us-central1-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_text", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
