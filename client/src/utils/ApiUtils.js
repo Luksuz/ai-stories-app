@@ -9,7 +9,7 @@ async function fetchBotReply(
   try {
     setIsGenerating(true);
     console.log("fetching bot reply");
-    const response = await fetch("http://localhost:5000/api/stories/generate", {
+    const response = await fetch("https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ async function generateStoryParts(
 ) {
   try {
     setIsGenerating(true);
-    const response = await fetch("http://localhost:5000/api/stories/generate", {
+    const response = await fetch("https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_img", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
