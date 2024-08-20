@@ -175,7 +175,7 @@ async function generateStoryParts(
 
 // a function for fetching images from the openai
 async function generateImages(prompt, setStory) {
-  const response = await fetch("http://localhost:5000/api/stories/images", {
+  const response = await fetch("https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_img", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
