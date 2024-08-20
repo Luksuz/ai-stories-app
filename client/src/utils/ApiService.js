@@ -1,6 +1,6 @@
 const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInput) => {
     const response = await fetch(
-      "http://lukamindek.myvnc.com:5001/api/stories/generate",
+      "https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate",
       {
         method: "POST",
         
@@ -27,7 +27,7 @@ const fetchStory = async (synopsis, previousPart, nextPart, randomEvent, userInp
   
   const fetchImage = async (imagePrompt) => {
     const response = await fetch(
-      "http://lukamindek.myvnc.com:5001/api/images/generate", {
+      "https://europe-west3-woven-perigee-425918-q9.cloudfunctions.net/aistories_generate_img", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
